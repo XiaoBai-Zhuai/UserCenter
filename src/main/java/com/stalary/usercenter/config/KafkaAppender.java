@@ -5,9 +5,8 @@ import ch.qos.logback.core.AppenderBase;
 import com.stalary.lightmqclient.LightMQProperties;
 import com.stalary.lightmqclient.WebClientService;
 import com.stalary.lightmqclient.facade.Producer;
-import com.stalary.usercenter.service.lightmq.Consumer;
+import com.stalary.usercenter.service.rmq.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 

@@ -4,7 +4,7 @@ import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.data.dto.ResponseMessage;
 import com.stalary.usercenter.service.MailService;
 import com.stalary.usercenter.service.UserService;
-import com.stalary.usercenter.service.lightmq.Consumer;
+import com.stalary.usercenter.service.rmq.Consumer;
 import com.stalary.usercenter.data.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

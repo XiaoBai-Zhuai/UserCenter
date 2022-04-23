@@ -1,24 +1,22 @@
 package com.stalary.usercenter.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.stalary.lightmqclient.facade.Producer;
 import com.stalary.usercenter.client.OutClient;
 import com.stalary.usercenter.data.Constant;
 import com.stalary.usercenter.data.ResultEnum;
-import com.stalary.usercenter.data.dto.UserStat;
 import com.stalary.usercenter.data.entity.Stat;
 import com.stalary.usercenter.data.entity.Ticket;
 import com.stalary.usercenter.data.entity.User;
 import com.stalary.usercenter.data.vo.UserVo;
 import com.stalary.usercenter.exception.MyException;
 import com.stalary.usercenter.repo.UserRepo;
-import com.stalary.usercenter.service.lightmq.Consumer;
 import com.stalary.usercenter.utils.DigestUtil;
 import com.stalary.usercenter.utils.PasswordUtil;
 import com.stalary.usercenter.utils.TimeUtil;
 import com.stalary.usercenter.utils.UCUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,8 +36,6 @@ import java.util.stream.Collectors;
 /**
  * UserService
  *
- * @author lirongqian
- * @since 2018/03/25
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -47,7 +43,7 @@ import java.util.stream.Collectors;
 public class UserService extends BaseService<User, UserRepo> {
 
     @Resource
-    private Producer producer;
+    private RocketMQTemplate producer;
 
     @Resource
     private TicketService ticketService;
@@ -139,11 +135,14 @@ public class UserService extends BaseService<User, UserRepo> {
         exec.execute(() -> {
             long start = System.currentTimeMillis();
             log.info("start async register task");
-            // 获取ip和地址
+           /* // 获取ip和地址
             String city = getAddress(ip);
             // 打入消息队列，异步统计
             UserStat userStat = new UserStat(user.getId(), city, new Date());
-            producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+            String json = JSONObject.toJSONString(userStat);
+            Map<String, String> map = new HashMap<>();
+            map.put("value", json);
+            producer.convertAndSend(Consumer.LOGIN_STAT, map);*/
             // 缓存7天
             String redisKey = genRedisKey(save.getId());
             redis.opsForValue().set(redisKey, JSONObject.toJSONString(save), 7, TimeUnit.DAYS);
@@ -196,9 +195,9 @@ public class UserService extends BaseService<User, UserRepo> {
             Stat stat = statService.findByUserId(oldUser.getId());
             // 当无统计信息时，不需要判断异地登陆
             if (stat == null) {
-                // 打入消息队列，异步统计
+                /*// 打入消息队列，异步统计
                 UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
-                producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+                producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));*/
             } else {
                 if (!city.equals(stat.getCityList().get(0).getAddress()) && StringUtils.isNotEmpty(user.getEmail())) {
                     log.warn(user.getUsername() + "异地登陆！" + city);
@@ -206,9 +205,9 @@ public class UserService extends BaseService<User, UserRepo> {
                     mailService.sendSimpleMail(user.getEmail());
                 }
             }
-            // 打入消息队列，异步统计
+            /*// 打入消息队列，异步统计
             UserStat userStat = new UserStat(oldUser.getId(), city, new Date());
-            producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));
+            producer.send(Consumer.LOGIN_STAT, JSONObject.toJSONString(userStat));*/
             log.info(UCUtil.genLog(Constant.USER_LOG, Constant.USER, oldUser.getId(), "登陆成功"));
             log.info("end async login task time=" + (System.currentTimeMillis() - start));
         });

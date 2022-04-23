@@ -38,12 +38,6 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <version>2.0.2.RELEASE</version>
         </dependency>
-        <!-- lightmq -->
-        <dependency>
-            <groupId>com.stalary</groupId>
-            <artifactId>lightmqclient</artifactId>
-            <version>0.0.1</version>
-        </dependency>
         <!-- jpa -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,11 +96,25 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
-        <!-- easydoc -->
+
         <dependency>
-            <groupId>com.stalary</groupId>
-            <artifactId>easy-doc</artifactId>
-            <version>1.1.0</version>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <version>2.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-webmvc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -148,24 +156,6 @@
                 </configuration>
             </plugin>
             <!-- Docker maven plugin -->
-            <plugin>
-                <groupId>com.stalary</groupId>
-                <artifactId>easydoc-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <!-- -Dpath可以替代 -->
-                <configuration>
-                    <path>com.stalary.usercenter</path>
-                    <excludeFile>CrossDomainFilter</excludeFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>save</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
